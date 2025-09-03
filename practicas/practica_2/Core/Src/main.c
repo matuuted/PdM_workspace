@@ -152,6 +152,8 @@ int main(void)
 	while (1)
 	{
 		if (delayRead(&led_delay)) {
+      		delayWrite(&led_delay, (toggle_count % 2 == 0) ? time_on : time_off); // Alterna entre tiempo de encendido y apagado dependiendo el DutyCycle.
+
 			HAL_GPIO_TogglePin(LD2_GPIO_Port, LD2_Pin);
 			toggle_count++;
 
@@ -168,11 +170,9 @@ int main(void)
 
 					pattern = &blink[index];
 					time_on  = (pattern->period * pattern->duty_cycle)/ 100;
-                    time_off = pattern->period - time_on;
-
+          			time_off = pattern->period - time_on;
 				}
 			}
-			delayWrite(&led_delay, (toggle_count % 2 == 0) ? time_on : time_off); // Alterna entre tiempo de encendido y apagado dependiendo el DutyCycle.
 		}
 	}
 
