@@ -29,7 +29,7 @@ Repo de referencia para prácticas de **Programación de microcontroladores** (C
 │   │   │        └── main.c
 │   │   └── 📁 Drivers
 │   │           ├── 📁 CMSIS
-│   │           ├── 📁 STM32F4xx_HAL_Driver
+│   │           └── 📁 STM32F4xx_HAL_Driver
 │   └── 📁 practica_2
 │   │   ├── 📁 Core
 │   │   │   ├── 📁 inc
@@ -38,7 +38,7 @@ Repo de referencia para prácticas de **Programación de microcontroladores** (C
 │   │   │        └── main.c
 │   │   └── 📁 Drivers
 │   │           ├── 📁 CMSIS
-│   │           ├── 📁 STM32F4xx_HAL_Driver
+│   │           └── 📁 STM32F4xx_HAL_Driver
 ├── 📁 stm32f429zi
 ├── .gitignore
 └── README.md
