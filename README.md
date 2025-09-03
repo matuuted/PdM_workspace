@@ -16,4 +16,31 @@ Repo de referencia para prácticas de **Programación de microcontroladores** (C
 
 ## 📂 Organización del Repositorio
 
-<pre> ``` 📁 pdm ├── 📁 assets ├── 📁 practica_0_template ├── 📁 practicas │ ├── 📁 practica_1 │ │ ├── 📁 Core │ │ │ ├── 📁 inc │ │ │ │ └── main.h │ │ │ └── 📁 src │ │ │ └── main.c │ │ └── 📁 Drivers │ │ ├── 📁 CMSIS │ │ └── 📁 STM32F4xx_HAL_Driver │ │ │ └── 📁 practica_2 │ ├── 📁 Core │ │ ├── 📁 inc │ │ │ └── main.h │ │ └── 📁 src │ │ └── main.c │ └── 📁 Drivers │ ├── 📁 CMSIS │ └── 📁 STM32F4xx_HAL_Driver │ ├── 📁 stm32f429zi ├── .gitignore └── README.md ``` </pre>
+<pre> ``` 
+📁 pdm
+├── 📁 assets
+├── 📁 practica_0_template
+├── 📁 practicas
+│   ├── 📁 practica_1
+│   │   ├── 📁 Core
+│   │   │   ├── 📁 inc
+│   │   │   │    └── main.h
+│   │   │   └── 📁 src
+│   │   │        └── main.c
+│   │   └── 📁 Drivers
+│   │           ├── 📁 CMSIS
+│   │           ├── 📁 STM32F4xx_HAL_Driver
+│   └── 📁 practica_2
+│   │   ├── 📁 Core
+│   │   │   ├── 📁 inc
+│   │   │   │    └── main.h
+│   │   │   └── 📁 src
+│   │   │        └── main.c
+│   │   └── 📁 Drivers
+│   │           ├── 📁 CMSIS
+│   │           ├── 📁 STM32F4xx_HAL_Driver
+├── 📁 stm32f429zi
+├── .gitignore
+└── README.md
+  
+  ``` </pre>
