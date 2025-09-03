@@ -43,6 +43,8 @@ Usar la API de retardos no bloqueantes (Punto 1) para hacer parpadear el LED de 
 2. En el `while`, cada vez que `delayRead` devuelve `true` → se conmuta el estado del LED.  
 3. Se vuelve a cargar el mismo retardo con `delayWrite()`.  
 
+>⚠️ **NOTA:** Para poder probar este ejercicio se debe agregar el `#define PUNTO_2` al comienzo de `main.c`.
+
 ---
 ## 🎯 Punto 3 – Secuencia de patrones 
 
@@ -94,6 +96,9 @@ La implementación del código utilizando la estructura `blink_pattern` busca qu
 - Cuando todos los patrones finalizan, se reinicia el ciclo.
 - El código recalcula los tiempos de encendido y apagado en función del período y del duty cycle.
 
+>⚠️ **NOTA:** Para poder probar este ejercicio, **NO** debe estar definido `#define PUNTO_2` al comienzo de `main.c`.
+
+---
 ## ✅ Checklist
 
 ### Punto 1
