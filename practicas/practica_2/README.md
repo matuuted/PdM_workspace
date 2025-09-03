@@ -1,4 +1,4 @@
-# Programación de Microcontroladores - Práctica 1
+# Programación de Microcontroladores - Práctica 2
 
 ## Objetivo:
 Implementar un módulo de software para trabajar con retardos no bloqueantes. 

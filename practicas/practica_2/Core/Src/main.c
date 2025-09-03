@@ -21,19 +21,23 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+// #define PUNTO_2
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
-
+const blink_pattern blink[NUM_PERIOD] = {
+  {REPETITIONS, LED_PERIOD_1000_MS,  DUTY_CYCLE_50},
+  {REPETITIONS, LED_PERIOD_200_MS, DUTY_CYCLE_50},
+  {REPETITIONS, LED_PERIOD_100_MS, DUTY_CYCLE_50}
+};
 /* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
+
 /* USER CODE END PD */
-#define True 1
-#define False 0
+
 /* Private macro -------------------------------------------------------------*/
 /* USER CODE BEGIN PM */
 
@@ -56,7 +60,34 @@ static void MX_USART2_UART_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-#define PUNTO1 True
+void delayInit(delay_t *delay, tick_t duration) {
+    delay->duration = duration;
+    delay->running = false;
+	delay->startTime = 0;
+}
+
+void delayWrite(delay_t *delay, tick_t duration) {
+    delay->duration = duration;
+}
+
+bool_t delayRead(delay_t *delay) {
+    tick_t current_time = HAL_GetTick();
+
+    if (!delay->running) {
+        delay->startTime = current_time;
+        delay->running = true;
+        return false;
+    }
+
+    if ((current_time - delay->startTime) >= delay->duration) {
+        delay->running = false;
+        return true;
+    }
+
+    return false;
+}
+
+
 /* USER CODE END 0 */
 
 /**
@@ -89,32 +120,63 @@ int main(void)
   MX_GPIO_Init();
   MX_USART2_UART_Init();
   /* USER CODE BEGIN 2 */
-  uint16_t delay = 200;
-  /* USER CODE END 2 */
+#ifdef PUNTO_2
 
-  /* Infinite loop */
-  /* USER CODE BEGIN WHILE */
-  while (1)
-  {
-    /* USER CODE END WHILE */
+	delay_t led_delay = {0};
+  	delayInit(&led_delay, LED_PERIOD_200_MS * 0.5); // Inicializa el retardo para 100 ms
+  	/* USER CODE END 2 */
 
-    /* USER CODE BEGIN 3 */
+	/* Infinite loop */
+	/* USER CODE BEGIN WHILE */
+	while (1)
+	{
+		/* USER CODE END WHILE */
 
-#if defined(PUNTO1) && PUNTO1 == True
-    /* Practica numero 1. */
-    HAL_GPIO_TogglePin(LD2_GPIO_Port, LD2_Pin);
-    HAL_Delay(delay);
+		/* USER CODE BEGIN 3 */
+		if (delayRead(&led_delay)) {
+			HAL_GPIO_TogglePin(LD2_GPIO_Port, LD2_Pin);
+			delayWrite(&led_delay,  LED_PERIOD_200_MS * 0.5); // Reinicia el retardo para otros 100 ms
+		}
+	}
 #else
-    /* Practica numero 2. */
-	  HAL_GPIO_TogglePin(LD2_GPIO_Port, LD2_Pin);
-	  HAL_Delay(delay);
 
-    if (!HAL_GPIO_ReadPin(B1_GPIO_Port, B1_Pin)){
-      delay = (delay == 200) ? 500 : 200;
-	  }
+  	delay_t led_delay = {0};
+  	const blink_pattern *pattern = &blink[0];
+	uint8_t toggle_count = 0, index = 0, repetitions = 0;
+
+	tick_t time_on  = (pattern->period * pattern->duty_cycle)/ 100;
+    tick_t time_off = pattern->period - time_on;
+	
+	delayInit(&led_delay, time_on); // Inicializa el retardo para 500ms seg para el primer periodo.
+
+	while (1)
+	{
+		if (delayRead(&led_delay)) {
+			HAL_GPIO_TogglePin(LD2_GPIO_Port, LD2_Pin);
+			toggle_count++;
+
+			if (toggle_count % 2 == 0) { // Ciclo completo de encendido y apagado. Sumo una repetición
+				repetitions++;
+				if (repetitions >= pattern->repetitions) {
+					repetitions = 0;
+					toggle_count = 0;
+					index++; // Se completa el patrón actual, paso al siguiente patrón.
+
+					if (index >= NUM_PERIOD) {
+						index = 0;
+					}
+
+					pattern = &blink[index];
+					time_on  = (pattern->period * pattern->duty_cycle)/ 100;
+                    time_off = pattern->period - time_on;
+
+				}
+			}
+			delayWrite(&led_delay, (toggle_count % 2 == 0) ? time_on : time_off); // Alterna entre tiempo de encendido y apagado dependiendo el DutyCycle.
+		}
+	}
+
 #endif
-
-  }
   /* USER CODE END 3 */
 }
 
