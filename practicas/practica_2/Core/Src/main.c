@@ -26,6 +26,8 @@
 
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
+
+/* Patrones de parpadeo:  repeticiones (ciclos ON+OFF), período total (ms) y duty (%). */
 const blink_pattern blink[NUM_PERIOD] = {
   {REPETITIONS, LED_PERIOD_1000_MS,  DUTY_CYCLE_50},
   {REPETITIONS, LED_PERIOD_200_MS, DUTY_CYCLE_50},
@@ -60,31 +62,35 @@ static void MX_USART2_UART_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+
+/* Inicializa la estructura delay sin arrancar el conteo */
 void delayInit(delay_t *delay, tick_t duration) {
     delay->duration = duration;
     delay->running = false;
 	delay->startTime = 0;
 }
 
+/* Actualiza la duración del delay existente */
 void delayWrite(delay_t *delay, tick_t duration) {
     delay->duration = duration;
 }
 
+/* Verifica si se cumplió el tiempo definido */
 bool_t delayRead(delay_t *delay) {
-    tick_t current_time = HAL_GetTick();
+    tick_t current_time = HAL_GetTick(); // Tiempo actual en ms
 
-    if (!delay->running) {
+    if (!delay->running) { // Si no estaba corriendo, inicia la estructura delay
         delay->startTime = current_time;
         delay->running = true;
         return false;
     }
 
-    if ((current_time - delay->startTime) >= delay->duration) {
+    if ((current_time - delay->startTime) >= delay->duration) { // Si el tiempo transcurrido >= duración, termina el delay
         delay->running = false;
         return true;
     }
 
-    return false;
+    return false; // Todavía no llegó al tiempo definido
 }
 
 
@@ -103,74 +109,95 @@ int main(void)
   /* MCU Configuration--------------------------------------------------------*/
 
   /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
-  HAL_Init();
+	HAL_Init();
 
   /* USER CODE BEGIN Init */
 
-  /* USER CODE END Init */
+	/* USER CODE END Init */
 
-  /* Configure the system clock */
-  SystemClock_Config();
+	/* Configure the system clock */
+	SystemClock_Config();
 
-  /* USER CODE BEGIN SysInit */
+	/* USER CODE BEGIN SysInit */
 
-  /* USER CODE END SysInit */
+	/* USER CODE END SysInit */
 
-  /* Initialize all configured peripherals */
-  MX_GPIO_Init();
-  MX_USART2_UART_Init();
-  /* USER CODE BEGIN 2 */
+	/* Initialize all configured peripherals */
+	MX_GPIO_Init();
+	MX_USART2_UART_Init();
+  	/* USER CODE BEGIN 2 */
+
+/* 
+ * Para probar:
+ * - Definir   #define PUNTO_2   → Ejecuta el Punto 2 (parpadeo fijo 100ms ON/OFF).
+ * - Comentar #define PUNTO_2   → Ejecuta el Punto 3 (parpadeo con varios patrones).
+ * 
+ * NOTA: Todas las definiciones y estructuras necesarias están definidas y comentadas en main.h
+ * - Las variables/funciones utilizan snake_case según las convenciones de C, salvo las definiciones requeridas por el ejercicio. (Por ejemplo: delayInit, delayRead, delayWrite , etc.)
+ */
 #ifdef PUNTO_2
-
+    /*
+     * Punto 2: Parpadeo fijo con duty del 50%.
+     * LED ON 100 ms y OFF 100 ms de forma periódica.
+     */
 	delay_t led_delay = {0};
-  	delayInit(&led_delay, LED_PERIOD_200_MS * 0.5); // Inicializa el retardo para 100 ms
+  	delayInit(&led_delay, (LED_PERIOD_200_MS * DUTY_CYCLE_50)/ 100); // Inicializa el retardo para 100 ms
   	/* USER CODE END 2 */
 
 	/* Infinite loop */
 	/* USER CODE BEGIN WHILE */
 	while (1)
 	{
-		/* USER CODE END WHILE */
-
-		/* USER CODE BEGIN 3 */
 		if (delayRead(&led_delay)) {
-			HAL_GPIO_TogglePin(LD2_GPIO_Port, LD2_Pin);
-			delayWrite(&led_delay,  LED_PERIOD_200_MS * 0.5); // Reinicia el retardo para otros 100 ms
+			HAL_GPIO_TogglePin(LD2_GPIO_Port, LD2_Pin); // Alterna el LED
+			delayWrite(&led_delay,  (LED_PERIOD_200_MS * DUTY_CYCLE_50)/ 100); // Reinicia el retardo para otros 100 ms
 		}
 	}
 #else
+    /*
+     * Punto 3: Parpadeo con varios patrones.
+     * Cada patrón define periodo, duty y repeticiones antes de pasar al siguiente.
+     */
 
-  	delay_t led_delay = {0};
-  	const blink_pattern *pattern = &blink[0];
+	delay_t led_delay = {0};
+	const blink_pattern *pattern = &blink[0];
 	uint8_t toggle_count = 0, index = 0, repetitions = 0;
 
-	tick_t time_on  = (pattern->period * pattern->duty_cycle)/ 100;
-    tick_t time_off = pattern->period - time_on;
-	
+	tick_t time_on  = (tick_t)(pattern->period * pattern->duty_cycle)/ 100;
+	tick_t time_off = (tick_t) pattern->period - time_on;
+
 	delayInit(&led_delay, time_on); // Inicializa el retardo para 500ms seg para el primer periodo.
 
 	while (1)
 	{
 		if (delayRead(&led_delay)) {
-      		delayWrite(&led_delay, (toggle_count % 2 == 0) ? time_on : time_off); // Alterna entre tiempo de encendido y apagado dependiendo el DutyCycle.
+			delayWrite(&led_delay, (toggle_count % 2 == 0) ? time_on : time_off); // Alterna entre tiempo de encendido y apagado dependiendo el Duty Cycle.
 
 			HAL_GPIO_TogglePin(LD2_GPIO_Port, LD2_Pin);
 			toggle_count++;
 
 			if (toggle_count % 2 == 0) { // Ciclo completo de encendido y apagado. Sumo una repetición
+
+				// Se suma una repeticion al patron actual.
 				repetitions++;
-				if (repetitions >= pattern->repetitions) {
+				if (repetitions >= pattern->repetitions) { // Se verifica si se completaron las repeticiones del patrón actual.
+					index++; // Se completo el patrón actual, paso al siguiente patrón.
+
+					// Reinicio los contadores.
 					repetitions = 0;
 					toggle_count = 0;
-					index++; // Se completa el patrón actual, paso al siguiente patrón.
 
+					// Si se llegó al final de los patrones, vuelvo al primero.
 					if (index >= NUM_PERIOD) {
 						index = 0;
 					}
 
+					// Actualizo el patrón actual.
 					pattern = &blink[index];
-					time_on  = (pattern->period * pattern->duty_cycle)/ 100;
-          			time_off = pattern->period - time_on;
+
+					// Calculo los tiempos de encendido y apagado según el nuevo patrón.
+					time_on  = (tick_t)(pattern->period * pattern->duty_cycle)/ 100;
+					time_off = (tick_t) pattern->period - time_on;
 				}
 			}
 		}

@@ -55,19 +55,41 @@ extern "C" {
 /* Exported functions prototypes ---------------------------------------------*/
 void Error_Handler(void);
 
+/* ============================================================================
+ * Tipos básicos y definiciones generales
+ * ==========================================================================*/
+
 /* USER CODE BEGIN EFP */
 typedef bool bool_t;
 typedef uint32_t tick_t;
 
+/* ============================================================================
+ * Macros y enumeraciones
+ * ==========================================================================*/
+
+/*
+ * Cantidad de patrones de parpadeo que se van a manejar en el arreglo blink[].
+ */
 #define NUM_PERIOD 3
+
+/*
+ * Número de repeticiones por patrón definida, ya que todos usan la misma cantidad de repeticiones.
+ */
 #define REPETITIONS 5
 
+/*
+ * Períodos típicos de parpadeo expresados en milisegundos.
+ * Se usan para definir la duración total de cada ciclo de parpadeo.
+ */
 typedef enum {
     LED_PERIOD_100_MS  = 100,
     LED_PERIOD_200_MS  = 200,
     LED_PERIOD_1000_MS = 1000
 } led_period_t;
 
+/*
+ * Valores posibles para el duty cycle (porcentaje de tiempo encendido).
+ */
 typedef enum {
     DUTY_CYCLE_25 = 25,
     DUTY_CYCLE_50 = 50,
@@ -75,12 +97,34 @@ typedef enum {
     DUTY_CYCLE_100 = 100
 } duty_cycle_t;
 
+
+/* ============================================================================
+ * Estructuras
+ * ==========================================================================*/
+
+/*
+ * Estructura que define un patrón de parpadeo:
+ * - period: duración total de un ciclo (ms).
+ * - duty_cycle: porcentaje de tiempo que el LED estará encendido (0-100%).
+ * - repetitions: cantidad de veces que se repetirá este patrón antes de
+ *   pasar al siguiente.
+ *
+ * Ejemplo:
+ *   {1000, 50, 5} → 5 ciclos de 1 segundo con LED encendido el 50% del tiempo.
+ */
 typedef struct {
     uint8_t repetitions;
     tick_t period;
     uint8_t duty_cycle; 
 } blink_pattern;
 
+/*
+ * Estructura para manejar un delay no bloqueante definida para la actividad.
+ *
+ * - startTime: marca de tiempo cuando se inicia el delay.
+ * - duration: duración que debe transcurrir para que el delay se cumpla (ms).
+ * - running: indica si el delay está activo (true) o esperando ser iniciado (false).
+ */
 typedef struct{
    tick_t startTime;
    tick_t duration;
