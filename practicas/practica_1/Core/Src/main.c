@@ -92,7 +92,7 @@ int main(void)
   MX_GPIO_Init();
   MX_USART2_UART_Init();
   /* USER CODE BEGIN 2 */
-  uint16_t delay = DELAY_200_MS;
+  uint16_t delay = DELAY_200_MS;  // Valor inicial del retardo (200 ms)
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -104,14 +104,20 @@ int main(void)
     /* USER CODE BEGIN 3 */
 
 #if defined(PUNTO1) && PUNTO1 == True
-    /* Practica numero 1. */
+    /* --- Práctica 1 ---
+       Parpadeo simple del LED con un retardo fijo de 200 ms
+    */
     HAL_GPIO_TogglePin(LD2_GPIO_Port, LD2_Pin);
     HAL_Delay(delay);
 #else
-    /* Practica numero 2. */
+    /* --- Práctica 2 ---
+       Parpadeo del LED con retardo que cambia según el botón.
+       El botón B1 alterna entre 200 ms y 500 ms.
+    */
 	  HAL_GPIO_TogglePin(LD2_GPIO_Port, LD2_Pin);
 	  HAL_Delay(delay);
 
+    // Si el botón está presionado, alterna entre 200 ms y 500 ms
     if (!HAL_GPIO_ReadPin(B1_GPIO_Port, B1_Pin)){
       delay = (delay == DELAY_200_MS) ? DELAY_500_MS : DELAY_200_MS;
 	  }
