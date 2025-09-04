@@ -57,6 +57,9 @@ static void MX_USART2_UART_Init(void);
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 #define PUNTO1 True
+#define DELAY_200_MS 200
+#define DELAY_500_MS 500
+
 /* USER CODE END 0 */
 
 /**
@@ -89,7 +92,7 @@ int main(void)
   MX_GPIO_Init();
   MX_USART2_UART_Init();
   /* USER CODE BEGIN 2 */
-  uint16_t delay = 200;
+  uint16_t delay = DELAY_200_MS;
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -110,7 +113,7 @@ int main(void)
 	  HAL_Delay(delay);
 
     if (!HAL_GPIO_ReadPin(B1_GPIO_Port, B1_Pin)){
-      delay = (delay == 200) ? 500 : 200;
+      delay = (delay == DELAY_200_MS) ? DELAY_500_MS : DELAY_200_MS;
 	  }
 #endif
 
