@@ -63,34 +63,74 @@ static void MX_USART2_UART_Init(void);
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 
-/* Inicializa la estructura delay sin arrancar el conteo */
+/* 
+ * Inicializa la estructura delay.
+ * 
+ * Entradas:
+ *  - delay: puntero a la estructura delay_t que se quiere inicializar.
+ *  - duration: tiempo de duración del delay en ms.
+ * 
+ * Salida:
+ *  - No devuelve valor. 
+ */
 void delayInit(delay_t *delay, tick_t duration) {
+    if (delay == NULL || duration == 0) {
+        return; // Los parámetros no son válidos.
+    }
     delay->duration = duration;
     delay->running = false;
-	delay->startTime = 0;
+	  delay->startTime = 0;
 }
 
-/* Actualiza la duración del delay existente */
+/* 
+ * Actualiza la duración configurada en el delay.
+ * 
+ * Entradas:
+ *  - delay: puntero a la estructura delay_t que se quiere actualizar.
+ *  - duration: nuevo tiempo de duración en ms.
+ * 
+ * Salida:
+ *  - No devuelve valor.
+ */
 void delayWrite(delay_t *delay, tick_t duration) {
+    if (delay == NULL || duration == 0) {
+        return; // Los parámetros no son válidos.
+    }
     delay->duration = duration;
 }
 
-/* Verifica si se cumplió el tiempo definido */
+/* 
+ * Verifica si el delay ha finalizado.
+ * 
+ * Entradas:
+ *  - delay: puntero a la estructura delay_t a verificar.
+ * 
+ * Salida (bool_t):
+ *  - true: el tiempo definido en la estructura se cumplió.
+ *  - false: el tiempo todavía no se cumplio.
+ * 
+ */
 bool_t delayRead(delay_t *delay) {
+
+    if (delay == NULL || delay->duration == 0) {
+        return false; // Los parámetros no son válidos.
+    }
     tick_t current_time = HAL_GetTick(); // Tiempo actual en ms
 
-    if (!delay->running) { // Si no estaba corriendo, inicia la estructura delay
+    // Si no estaba corriendo, inicia la estructura delay
+    if (!delay->running) { 
         delay->startTime = current_time;
         delay->running = true;
         return false;
     }
 
-    if ((current_time - delay->startTime) >= delay->duration) { // Si el tiempo transcurrido >= duración, termina el delay
+    // Verifica si el tiempo definido se cumplió
+    if ((current_time - delay->startTime) >= delay->duration) { 
         delay->running = false;
         return true;
     }
 
-    return false; // Todavía no llegó al tiempo definido
+    return false; // Todavía no llegó a cumplir el tiempo definido
 }
 
 
