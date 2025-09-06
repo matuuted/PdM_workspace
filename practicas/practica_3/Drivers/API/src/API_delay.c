@@ -1,4 +1,5 @@
 #include "API_delay.h"
+#include "stm32f4xx_hal.h"
 
 /* 
  * Inicializa la estructura delay.
@@ -12,11 +13,11 @@
  */
 void delayInit(delay_t *delay, tick_t duration) {
     if (delay == NULL || duration == 0) {
-        return; // Los parámetros no son válidos.
+        return; // El puntero o la duracion no son válidos.
     }
     delay->duration = duration;
     delay->running = false;
-	  delay->startTime = 0;
+	delay->startTime = 0;
 }
 
 /* 
@@ -31,7 +32,7 @@ void delayInit(delay_t *delay, tick_t duration) {
  */
 void delayWrite(delay_t *delay, tick_t duration) {
     if (delay == NULL || duration == 0) {
-        return; // Los parámetros no son válidos.
+        return; // El puntero o la duracion no son válidos.
     }
     delay->duration = duration;
 }
@@ -50,11 +51,11 @@ void delayWrite(delay_t *delay, tick_t duration) {
 bool_t delayRead(delay_t *delay) {
 
     if (delay == NULL || delay->duration == 0) {
-        return false; // Los parámetros no son válidos.
+        return false; // El puntero o la duracion no son válidos.
     }
     tick_t current_time = HAL_GetTick(); // Tiempo actual en ms
 
-    // Si no estaba corriendo, inicia la estructura delay
+    // Si no estaba actualmente corriendo, inicia la estructura delay
     if (!delay->running) { 
         delay->startTime = current_time;
         delay->running = true;
@@ -86,8 +87,7 @@ bool_t delayRead(delay_t *delay) {
  * 
  */
 bool_t delayIsRunning(delay_t * delay) {
-    if (delay == NULL) return false; // Los parámetros no son válidos.
+    if (delay == NULL) return false; // El puntero delay no es valido.
 
-    // Retorna el estado actual del delay
-    return delay->running;
+    return delay->running; // Retorna el estado actual del delay
 }

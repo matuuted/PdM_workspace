@@ -3,40 +3,9 @@
 
 #include <stdint.h>
 #include <stdbool.h>
-#include "stm32f4xx_hal.h"
 
 typedef bool bool_t;
 typedef uint32_t tick_t;
-
-
-
-/* ============================================================================
- * Macros y enumeraciones
- * ==========================================================================*/
-
-// Número de parpadeos.
- #define NUM_TIMES    4
-
-/*
- * Períodos típicos de parpadeo expresados en milisegundos.
- * Se usan para definir la duración total de cada ciclo de parpadeo.
- */
-typedef enum {
-    LED_PERIOD_100_MS  = 100,
-    LED_PERIOD_200_MS  = 200,
-    LED_PERIOD_500_MS  = 500,
-    LED_PERIOD_1000_MS = 1000
-} led_period_t;
-
-/*
- * Valores posibles para el duty cycle (porcentaje de tiempo encendido).
- */
-typedef enum {
-    DUTY_CYCLE_25  = 25,
-    DUTY_CYCLE_50  = 50,
-    DUTY_CYCLE_75  = 75,
-    DUTY_CYCLE_100 = 100
-} duty_cycle_t;
 
 
 /* ============================================================================
