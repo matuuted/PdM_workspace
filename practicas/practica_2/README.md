@@ -38,7 +38,7 @@ Usar la API de retardos no bloqueantes (Punto 1) para hacer parpadear el LED.
 - Duty cycle fijo = **50%**.  
 - Parpadeo indefinido (ciclo continuo).  
 
->⚠️ **NOTA:** Para poder probar este ejercicio se debe agregar el `#define PUNTO_2` al comienzo de `main.c`.
+>⚠️ **NOTA:** Para poder probar este ejercicio hay que agregar el `#define PUNTO_2` al comienzo de `main.c`.
 
 ---
 ## Punto 3 – Secuencia de patrones 
