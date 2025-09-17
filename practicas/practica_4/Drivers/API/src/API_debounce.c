@@ -2,6 +2,7 @@
 #ifdef PUNTO_2
 #include "API_delay.h"
 #include "stm32f4xx_hal.h"
+#include "dev_gpio_cfg.h"
 
 static debounceState_t state;
 static delay_t delay;

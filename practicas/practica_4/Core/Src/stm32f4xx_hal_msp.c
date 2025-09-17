@@ -20,6 +20,7 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include "dev_gpio_cfg.h"
 /* USER CODE BEGIN Includes */
 
 /* USER CODE END Includes */

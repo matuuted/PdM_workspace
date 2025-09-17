@@ -19,13 +19,13 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "API_delay.h"
+#include "dev_gpio_cfg.h"
 #ifdef PUNTO_2
 #include "API_debounce.h" // Para el PUNTO 2 importo la API de debounce.
-#endif
-
-
+#else
 static debounceState_t state;
 static delay_t delay;
+#endif
 
 UART_HandleTypeDef huart2;
 
