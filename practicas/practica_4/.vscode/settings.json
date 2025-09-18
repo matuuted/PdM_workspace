@@ -3,7 +3,8 @@
         "api_delay.h": "c",
         "stm32f4xx_hal.h": "c",
         "main.h": "c",
-        "api_debounce.h": "c"
+        "api_debounce.h": "c",
+        "dev_gpio_cfg.h": "c"
     },
     "cortex-debug.gdbPath": "${env:GDB}"
 }

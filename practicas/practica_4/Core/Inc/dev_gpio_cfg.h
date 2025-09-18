@@ -9,10 +9,6 @@
 #ifndef __DEV_GPIO_CFG_H_
 #define __DEV_GPIO_CFG_H_
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 /*****************************************************************************
  * Public types/enumerations/variables
  ****************************************************************************/
@@ -33,9 +29,5 @@ extern "C" {
 /*****************************************************************************
  * Public functions
  ****************************************************************************/
-
-#ifdef __cplusplus
-} /* Closing brace for extern "C" */
-#endif
 
 #endif /* __DEV_GPIO_CFG_H_ */

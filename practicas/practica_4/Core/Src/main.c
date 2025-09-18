@@ -29,7 +29,6 @@ static delay_t delay;
 
 UART_HandleTypeDef huart2;
 
-
 void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
 static void MX_USART2_UART_Init(void);
@@ -37,96 +36,87 @@ static void MX_USART2_UART_Init(void);
 
 #ifdef PUNTO_1
 /* 
- * Lee el estado del Pulsador B1.
- * 
- * Entradas:
- *  - void
- * 
- * Salida:
- *  - Retorna el estado del GPIO.
- *  - true: si el botón está presionado.
- * - false: si el botón no está presionado. 
+ * Lee el estado del pulsador.
+ * @return true si está presionado, false si no.
  */
 static bool get_button_state(void) {
     return (HAL_GPIO_ReadPin(B1_GPIO_Port, B1_Pin) == GPIO_PIN_RESET);
 }
 
-/* 
- * Enciende el Led.
- * 
- * Entradas:
- *  - void
- * 
- * Salida:
- *  - void
+/**
+ * Función para encender el LED.
  */
-static void turn_led_on(void)  { 
+static void buttonPressed(void) {
 	HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, GPIO_PIN_SET);
 }
-
-/* 
- * Apaga el Led.
- * 
- * Entradas:
- *  - void
- * 
- * Salida:
- *  - void
- */
-static void turn_led_off(void) { 
+static void buttonReleased(void) {
 	HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, GPIO_PIN_RESET);
 }
 
 
-
+/* 
+ * Inicializa la State Machine del antirrebote.
+ * 
+ * Entradas y salidas:
+ *  - void
+ */
 void debounceFSM_init(void) {
     state = BUTTON_UP;
     delayInit(&delay, DEBOUNCE_TIME_MS);
 }
 
+/**
+ * Actualiza la máquina de estados según el estado del pulsador.
+ */
 void debounceFSM_update(void) {
     switch (state) {
-		case BUTTON_UP:
+		case BUTTON_UP: // Espera a que el botón sea presionado.
 			if (get_button_state()) {
 				state = BUTTON_FALLING;
-				delayInit(&delay, DEBOUNCE_TIME_MS);
 			}
 			break;
 
-		case BUTTON_FALLING:
+		case BUTTON_FALLING: // Se verifica si la pulsación es estable (antirrebote)
 			if (delayRead(&delay)) {
 				if (get_button_state()) {
 					state = BUTTON_DOWN;
-					turn_led_on();                  // flanco descendente confirmado
+					buttonPressed(); // Confirmado el flanco de bajada, enciende el LED.
 				} else {
-					state = BUTTON_UP;        // ruido
+					state = BUTTON_UP; // Lo que se detecto fue ruido.
 				}
 			}
 			break;
 
-		case BUTTON_DOWN:
+		case BUTTON_DOWN: // Se espera a que el botón sea liberado
 			if (!get_button_state()) {
 				state = BUTTON_RAISING;
-				delayInit(&delay, DEBOUNCE_TIME_MS);
 			}
 			break;
 
-		case BUTTON_RAISING:
+		case BUTTON_RAISING: // Verifica si se libera el botón y si es estable (antirrebote)
 			if (delayRead(&delay)) {
 				if (!get_button_state()) {
 					state = BUTTON_UP;
-					turn_led_off();
+					buttonReleased(); // Confirmado el flanco de subida, apaga el LED.
 				} else {
-					state = BUTTON_DOWN;
+					state = BUTTON_DOWN; // Lo que se detecto fue ruido.
 				}
 			}
 			break;
 
 		default:
-			debounceFSM_init(); // fail-safe
+			debounceFSM_init(); // Reinicia la máquina en caso de estado inválido
 			break;
     }
 }
+
+#else
+
+#define LED_100_MS 100
+#define LED_500_MS 500
+
+static delay_t led_delay;
+static uint32_t led_period = LED_100_MS;
 
 #endif
 /* USER CODE END 0 */
@@ -148,11 +138,35 @@ int main(void)
 	MX_USART2_UART_Init();
 	/* USER CODE BEGIN 2 */
 
-    debounceFSM_init();
+#ifdef PUNTO_1
+
+	debounceFSM_init();
 
     while (1) {
 		debounceFSM_update(); 
     }
+
+#else
+
+	debounceFSM_init();
+	delayInit(&led_delay, led_period);
+
+	while (1) {
+		debounceFSM_update(); 
+
+		if (readKey()) { // Getter del flag que indica el estado del pulsador.
+			// Cambia la frecuencia cada vez que se detecta que el botón fue presionado.
+			led_period = (led_period == LED_100_MS) ? LED_500_MS : LED_100_MS;
+			delayInit(&led_delay, led_period);
+		}
+
+		if (delayRead(&led_delay)) {
+			HAL_GPIO_TogglePin(LD2_GPIO_Port, LD2_Pin); // Cambia el estado del LED.
+		}
+	}
+
+#endif
+
   /* USER CODE END 3 */
 }
 

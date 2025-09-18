@@ -1,144 +1,66 @@
-# Programación de Microcontroladores - Práctica 3
 
-## Objetivo:
-Implementar un módulo de software para trabajar con retardos no bloqueantes a partir de las funciones creadas en la práctica 2.
+# Programación de Microcontroladores - Práctica 4
 
-## 🎯 Punto 1 – Definición de funciones para retardos no bloqueantes
+## Objetivo
+Implementar una Máquina de Estados Finitos (MEF) para trabajar con anti-rebotes por software.
 
-### Objetivo
-Implementar funciones auxiliares para usar **retardos no bloqueantes** en `API_delay.c` y `API_delay.h`.
-
-### Definiciones en `API_delay.h`
-```c
-#include <stdint.h>   // para uint32_t
-#include <stdbool.h>  // para bool
-#include "stm32f4xx_hal.h"
-
-typedef uint32_t tick_t;
-typedef bool     bool_t;
-
-typedef struct {
-  tick_t startTime;
-  tick_t duration;
-  bool_t running;
-} delay_t;
-
-// Inicializa la estructura de delay, configurando la duracion del timer.
-void   delayInit(delay_t *delay, tick_t duration);
-
-// Retorna true si el delay ha terminado
-bool_t delayRead(delay_t *delay);
-
-// Actualiza el valor de duración del timer
-void   delayWrite(delay_t *delay, tick_t duration);
-
-```
-
-### Definiciones en `API_delay.c`
-```c
-#include "API_delay.h"
-
-void delayInit(delay_t *delay, tick_t duration) {
-    if (delay == NULL) return;
-
-    delay->duration = duration;
-    delay->running = false;
-	  delay->startTime = 0;
-}
-
-void delayWrite(delay_t *delay, tick_t duration) {
-    if (delay != NULL) {
-        delay->duration = duration;
-    }
-}
-
-bool_t delayRead(delay_t *delay) {
-    if (delay == NULL) return false;
-
-    tick_t current_time = HAL_GetTick();
-    if (!delay->running) {
-        delay->startTime = current_time;
-        delay->running = true;
-        return false;
-    }
-
-    if ((current_time - delay->startTime) >= delay->duration) {
-        delay->running = false;
-        return true;
-    }
-
-    return false;
-}
-```
 ---
-## 🎯 Punto 2 – Parpadeo periódico utilizando una secuencia definida.
+## 🎯 Punto 1 – Implementación de MEF anti-rebote
 
 ### Objetivo
-Implementar un programa que utilice retardos no bloqueantes y haga titilar en forma periódica un led de la placa NUCLEO-F4xx de acuerdo a una secuencia predeterminada:
+Crear un nuevo proyecto como copia del realizado en la práctica 3 e implementar una MEF anti-rebote para leer el estado del pulsador y generar eventos ante flancos ascendentes y descendentes.
+
+### Requerimientos
+- Estado inicial de la MEF: `BUTTON_UP`.
+- Implementar en `main.c` las funciones:
+    - `void debounceFSM_init();`  // Carga el estado inicial
+    - `void debounceFSM_update();` // Lógica de transición y actualización de salidas
+    - `void buttonPressed();`      // Enciende el LED
+    - `void buttonReleased();`     // Apaga el LED
+- Tiempo de anti-rebote: **40 ms** (retardo no bloqueante).
+- Llamar periódicamente a `debounceFSM_update()` dentro de main.c.
+- Definición de estados para la MEF:
 ```c
-const uint32_t TIEMPOS[] = {500, 100, 100, 1000};
+typedef enum{
+    BUTTON_UP,
+    BUTTON_FALLING,
+    BUTTON_DOWN,
+    BUTTON_RAISING,
+} debounceState_t;
 ```
 
-### Descripción
-- El LED debe encenderse y apagarse con la secuencia de tiempos definida en TIEMPOS[].
-- Utilizar la función `delayWrite()` y una única variable tipo `delay_t` para cambiar el tiempo de encendido del led. 
-- Duty cycle fijo = **50%**.  
-- Parpadeo indefinido (ciclo continuo).  
-
-### Lógica de funcionamiento
-1. Se inicializa la estructura `led_delay` con un retardo de **250ms (LED_PERIOD_500_MS * 0.5)** con `delayInit`.  
-2. En el `while`, cada vez que `delayRead` devuelve `true` → se conmuta el estado del LED.  
-3. Se vuelve a actualizar el retardo correspondiente con `delayWrite()`.  
 ---
-## 🎯 Punto 3 – Verificacion de `delay`
+## 🎯 Punto 2 – Módulo API_debounce y cambio de frecuencia de parpadeo
 
 ### Objetivo
-Implementar la siguiente función auxiliar pública en `API_delay.c`
+Implementar el módulo de software en `API_debounce.c` y `API_debounce.h` en las carpetas `/Drivers/API/src` y `/Drivers/API/inc` para controlar la MEF del anti-rebote. Luego, realizar un programa que cambie la frecuencia de parpadeo del LED entre **100 ms** y **500 ms** cada vez que se presione la tecla.
 
-```c
-bool_t delayIsRunning(delay_t * delay);
-```
-### Defines principales
-```c
-#define NUM_TIMES    4
-```
+### Requerimientos
+- En `API_debounce.h`:
+    - Agregar las siguientes funciones públicas:
+        - `void debounceFSM_init();`
+        - `void debounceFSM_update();`
+        - `bool_t readKey();`
+- En `API_debounce.c`:
+    - Declarar de manera privada `debounceState_t` y variable de estado global privada (static).
+    - Variable global privada tipo `bool_t` que se cambia a true cuando se detecta un flanco descendente y en false al llamar a `readKey()`.
 
-### Enum principales 
-```c
-typedef enum {
-    LED_PERIOD_100_MS  = 100,
-    LED_PERIOD_200_MS  = 200,
-    LED_PERIOD_500_MS  = 500,
-    LED_PERIOD_1000_MS = 1000
-} led_period_t;
+---
+## Estructura de Archivos
+- `Core/Src/main.c`: Implementación principal de la MEF para el Punto 1.
+- `Drivers/API/inc/API_debounce.h`: Prototipos y declaraciones públicas del módulo anti-rebote (Punto 2).
+- `Drivers/API/src/API_debounce.c`: Implementación del módulo anti-rebote (Punto 2).
+- `Drivers/API/inc/API_delay.h` y `Drivers/API/src/API_delay.c`: Módulo de retardos no bloqueantes.
 
-typedef enum {
-    DUTY_CYCLE_25 = 25,
-    DUTY_CYCLE_50 = 50,
-    DUTY_CYCLE_75 = 75,
-    DUTY_CYCLE_100 = 100
-} duty_cycle_t;
-```
+---
+## Detalles a tener en cuenta al momento de compilación.
+Para poder desarrollar ambos puntos, se agregaron `#ifdef` que permiten la ejecucion de codigo diferenciado.
+Para compilarlo correctamente, hace falta agregar la definicion `PUNTO_1` o `PUNTO_2` en el MCU GCC Compiler.
+- A continuación se detallan los pasos para agregarlo: 
+1. Click derecho sobre el proyecto `practica_4`.
+2. Propiedades.
+3. Dentro de la pestaña `C/C++ Build`, clickear en `Settings`.
+4. Dentro de la pestaña `MCU GCC Compiler`, clickear en `Preproccesor`.
+5. En `Define symbols (-D)`, clickear en `Add..` y agregar el correspondiente -> `PUNTO_1` o `PUNTO_2`.
 
-### Estructuras principales
-```c
-typedef struct {
-    tick_t startTime;
-    tick_t duration;
-    bool_t running;
-} delay_t;
-```
-### Definicion de `delayIsRunning(delay_t * delay)`
-```c
-bool_t delayIsRunning(delay_t * delay) {
-    if (delay == NULL) return false;
-    return delay->running;
-}
-```
-
-### Descripción del funcionamiento
-1. Se calculan los tiempos de encendido y apagado (`time_on` y `time_off`) a partir del período actual y un duty cycle fijo del **50%**.  
-2. `delayRead()` verifica cuándo alternar el estado del LED.  
-3. Se implementó `bool_t delayIsRunning(delay_t *delay)` para consultar si el delay está corriendo. En caso de retornar **false**, actualiza el delay con el tiempo correspondiente.
-4. Cada ciclo completo (ON + OFF) avanza al siguiente período definido en `TIEMPOS`.  
-5. Cuando se llega al final de la lista, la secuencia se reinicia desde el primer período.
+---
