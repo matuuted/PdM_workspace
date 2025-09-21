@@ -55,7 +55,7 @@ Implementar el módulo de software en `API_debounce.c` y `API_debounce.h` en las
 ---
 ## Detalles a tener en cuenta al momento de compilación.
 Para poder desarrollar ambos puntos, se agregaron `#ifdef` que permiten la ejecucion de codigo diferenciado.
-Para compilarlo correctamente, hace falta agregar la definicion `PUNTO_1` o `PUNTO_2` en el MCU GCC Compiler.
+Para compilarlo correctamente, hace falta agregar la definicion `PUNTO_1` o `PUNTO_2` en el `MCU GCC Compiler`.
 - A continuación se detallan los pasos para agregarlo: 
 1. Click derecho sobre el proyecto `practica_4`.
 2. Propiedades.
