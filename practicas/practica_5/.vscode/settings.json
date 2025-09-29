@@ -1,0 +1,11 @@
+{
+    "files.associations": {
+        "api_delay.h": "c",
+        "stm32f4xx_hal.h": "c",
+        "main.h": "c",
+        "usart.h": "c",
+        "dev_uart.h": "c",
+        "api_uart.h": "c"
+    },
+    "cortex-debug.gdbPath": "${env:GDB}"
+}
