@@ -2,12 +2,6 @@
 # Programación de Microcontroladores - Práctica 5
 
 ## Objetivo
-Implementar un módulo de software para utilizar la **UART**, utilizando la **HAL** de STM32.
-
----
-## 🎯 Punto 1 – Módulo UART
-
-## Objetivo
 Implementar un módulo de software que permita trabajar con **UART**, utilizando la **HAL** de STM32 en **modo polling**.  
 - El módulo debe permitir inicializar la UART, enviar y recibir datos.
 
