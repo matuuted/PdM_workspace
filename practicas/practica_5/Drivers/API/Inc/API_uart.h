@@ -54,6 +54,7 @@ bool uartDeInit();
 /**
  * @brief Envía una cadena de bytes por UART finalizada en '\0'.
  * @param pstring Puntero a la cadena a enviar.
+ * @return void
  */
 void uartSendString(uint8_t * pstring);
 
@@ -61,6 +62,7 @@ void uartSendString(uint8_t * pstring);
  * @brief Envía una cantidad específica de bytes por UART.
  * @param pstring Puntero al buffer de datos.
  * @param size Cantidad de bytes a enviar.
+ * @return void
  */
 void uartSendStringSize(uint8_t * pstring, uint16_t size);
 
@@ -68,6 +70,7 @@ void uartSendStringSize(uint8_t * pstring, uint16_t size);
  * @brief Recibe una cantidad de bytes por UART.
  * @param pstring Puntero al buffer donde se guardarán los datos.
  * @param size Cantidad de bytes a recibir.
+ * @return void
  */
 void uartReceiveStringSize(uint8_t * pstring, uint16_t size);
 

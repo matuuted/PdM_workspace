@@ -5,7 +5,9 @@
         "main.h": "c",
         "usart.h": "c",
         "dev_uart.h": "c",
-        "api_uart.h": "c"
+        "api_uart.h": "c",
+        "api_debounce.h": "c",
+        "gpio.h": "c"
     },
     "cortex-debug.gdbPath": "${env:GDB}"
 }
