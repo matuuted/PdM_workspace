@@ -5,7 +5,7 @@
 Implementar un módulo de software para utilizar la **UART**, utilizando la **HAL** de STM32.
 
 ---
-## 🎯 Punto 1 – Implementación de MEF anti-rebote
+## 🎯 Punto 1 – Módulo UART
 
 ## Objetivo
 Implementar un módulo de software que permita trabajar con **UART**, utilizando la **HAL** de STM32 en **modo polling**.  
